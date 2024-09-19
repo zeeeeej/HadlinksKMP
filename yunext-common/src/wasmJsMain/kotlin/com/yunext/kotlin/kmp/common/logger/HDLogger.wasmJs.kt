@@ -8,7 +8,7 @@ actual interface HDLogger {
     actual fun e(tag: String, msg: String)
 
     actual companion object : HDLogger {
-        override var debug: Boolean = false
+        actual override var debug: Boolean = false
         actual override fun d(tag: String, msg: String) {
             println("[$tag][D] $msg")
         }

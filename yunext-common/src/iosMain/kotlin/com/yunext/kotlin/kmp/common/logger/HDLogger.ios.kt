@@ -1,3 +1,5 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.yunext.kotlin.kmp.common.logger
 
 import kotlin.native.concurrent.ThreadLocal
@@ -11,7 +13,7 @@ actual interface HDLogger {
 
     @ThreadLocal
     actual companion object : HDLogger {
-        override var debug: Boolean = false
+        actual override var debug: Boolean = false
         actual override fun d(tag: String, msg: String) {
             println("[$tag][D] $msg")
         }

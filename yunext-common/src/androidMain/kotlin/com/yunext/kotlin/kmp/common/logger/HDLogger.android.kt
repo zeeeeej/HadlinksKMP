@@ -10,7 +10,7 @@ actual interface HDLogger {
     actual fun e(tag: String, msg: String)
 
     actual companion object : HDLogger {
-        override var debug: Boolean = true
+        actual override var debug: Boolean = true
         actual override fun d(tag: String, msg: String) {
             if (!debug)return
             Log.d(tag,msg)

@@ -61,10 +61,10 @@ kotlin {
 
         }
         commonMain.dependencies {
-//            implementation(compose.runtime)
-//            implementation(compose.foundation)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
             implementation(compose.material)
-//            implementation(compose.ui)
+            implementation(compose.ui)
             implementation(compose.components.resources) // SEE https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-images-resources.html
             implementation(compose.components.uiToolingPreview)
             implementation(projects.shared)

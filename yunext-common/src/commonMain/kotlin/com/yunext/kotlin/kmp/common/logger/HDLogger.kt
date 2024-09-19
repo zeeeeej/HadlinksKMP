@@ -53,6 +53,9 @@ expect interface HDLogger {
     fun e(tag: String, msg: String)
 
     companion object : HDLogger {
+
+        override var debug: Boolean 
+
         override fun d(tag: String, msg: String)
 
         override fun i(tag: String, msg: String)
