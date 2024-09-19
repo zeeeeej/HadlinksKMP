@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Kotlin Multiplatform Sample</string>
+    <string name="hello">Hello Kotlin Multiplatform!!!</string>
+</resources>
