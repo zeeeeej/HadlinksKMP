@@ -1,6 +1,7 @@
 [versions]
 agp = "8.2.2"
 kotlin = "2.0.20"
+kotlinx-datetime = "0.6.0"
 nexus-publish = "2.0.0-rc-1"
 android-minSdk = "28"
 android-compileSdk = "34"
@@ -23,6 +24,8 @@ logback = "1.5.6"
 
 kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.7.0"
+uiDesktop = "1.7.0"
+yunextContext = "0.0.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -72,7 +75,11 @@ kotlinx-coroutines-javax = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 
 # [serialization] https://github.com/Kotlin/kotlinx.serialization/tree/master
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
-
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+# reflect
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
+yunext-context = { module = "io.github.zeeeeej:yunext-context", version.ref = "yunextContext" }
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -83,3 +90,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+[bundles]
+yunext = ["yunext-context"]

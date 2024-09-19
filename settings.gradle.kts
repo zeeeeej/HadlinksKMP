@@ -36,3 +36,4 @@ dependencyResolutionManagement {
 include(":composeApp")
 include(":shared")
 include(":yunext-context")
+include(":yunext-common")

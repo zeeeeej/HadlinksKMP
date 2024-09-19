@@ -59,6 +59,9 @@ kotlin {
 //            implementation(libs.ktor.client.logging)
 //            implementation(libs.ktor.client.core.wasm)
 //            implementation(libs.ktor.client.core)
+
+            implementation(projects.yunextCommon)
+            implementation(projects.yunextContext)
         }
 
         iosMain.dependencies {

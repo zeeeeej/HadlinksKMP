@@ -54,6 +54,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 //put your multiplatform dependencies here
+                implementation(libs.kotlinx.datetime)
+                implementation(projects.yunextContext)
+                implementation(libs.kotlin.reflect)
             }
         }
         val commonTest by getting {
@@ -71,13 +74,16 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
 }
+//dependencies {
+//    implementation(libs.androidx.ui.desktop) // ? 做什么的
+//}
 
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     signAllPublications()
 
-    coordinates("io.github.zeeeeej", "yunext-context", appVersion)
+    coordinates("io.github.zeeeeej", "yunext-common", appVersion)
 
     pom {
         name.set("HadlinksKMP")
