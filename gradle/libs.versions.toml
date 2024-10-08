@@ -8,6 +8,7 @@ android-compileSdk = "34"
 maven-publish = "0.28.0"
 
 android-targetSdk = "30"
+android-lifecycle = "2.7.0"
 androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
@@ -20,12 +21,18 @@ junit = "4.13.2"
 ktor = "2.3.11"
 ktor-wasm = "3.2.0"
 
+
 logback = "1.5.6"
 
 kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.7.0"
 uiDesktop = "1.7.0"
-yunextContext = "0.0.1"
+yunextContext = "0.0.2"
+yunextCommon = "0.0.1"
+zhongguose = "0.0.1"
+zeeeeej = "1.0.2"
+task-tree = "2.1.1"
+activity = "1.9.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -64,7 +71,7 @@ ktor-client-winhttp = { module = "io.ktor:ktor-client-winhttp", version.ref = "k
 ktor-client-curl = { module = "io.ktor:ktor-client-curl", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 # --jvm/android/native
-ktor-client-cio= { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 
 
 # [coroutines] https://github.com/Kotlin/kotlinx.coroutines/blob/master/ui/coroutines-guide-ui.md
@@ -80,6 +87,20 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
 yunext-context = { module = "io.github.zeeeeej:yunext-context", version.ref = "yunextContext" }
+yunext-common = { module = "io.github.zeeeeej:yunext-common", version.ref = "yunextCommon" }
+zeeeeej-zhongguohong = { module = "io.github.zeeeeej:zhongguohong", version.ref = "zeeeeej" }
+zeeeeej-zhongguohong-compose = { module = "io.github.zeeeeej:zhongguohong-compose", version.ref = "zeeeeej" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+# Androidx Lifecycle
+androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "android-lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "android-lifecycle" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "android-lifecycle" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "android-lifecycle" }
+androidx-lifecycle-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "android-lifecycle" }
+androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "android-lifecycle" }
+androidx-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "android-lifecycle" }
+androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "android-lifecycle" }
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -90,5 +111,13 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+task-tree = { id = "com.dorongold.task-tree", version.ref = "task-tree" }
 [bundles]
-yunext = ["yunext-context"]
+yunext = ["yunext-context", "yunext-common", "zeeeeej-zhongguohong", "zeeeeej-zhongguohong-compose"]
+androidx-lifecycle = ["androidx-lifecycle-viewmodel","androidx-lifecycle-viewmodel-ktx",
+    "androidx-lifecycle-livedata-ktx", "androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-savedstate",
+    "androidx-lifecycle-common-java8",
+    "androidx-lifecycle-compiler",
+    "androidx-lifecycle-service",
+    "androidx-lifecycle-process",
+]

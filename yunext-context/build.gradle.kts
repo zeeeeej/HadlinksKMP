@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-val appVersion = "0.0.1"
+val appVersion = "0.0.2"
 
 group = "io.github.zeeeeej"
 version = appVersion

@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -60,8 +62,16 @@ kotlin {
 //            implementation(libs.ktor.client.core.wasm)
 //            implementation(libs.ktor.client.core)
 
-            implementation(projects.yunextCommon)
-            implementation(projects.yunextContext)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material)
+            implementation(compose.ui)
+            implementation(compose.components.resources) // SEE https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-images-resources.html
+            implementation(compose.components.uiToolingPreview)
+//            implementation(projects.yunextCommon)
+//            implementation(projects.yunextContext)
+            implementation(libs.bundles.yunext)
+            implementation(projects.yunextBle)
         }
 
         iosMain.dependencies {
@@ -74,6 +84,10 @@ kotlin {
             api(libs.ktor.client.core)
             api(libs.ktor.client.okhttp)
             api(libs.ktor.client.cio)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.activity)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.bundles.androidx.lifecycle)
         }
 
         val wasmJsMain by getting {

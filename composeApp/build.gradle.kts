@@ -11,17 +11,19 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
         browser {
+            val projectDirPath = project.projectDir.path
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
-                        add(project.projectDir.path)
+                        add(projectDirPath)
                     }
                 }
             }
@@ -71,7 +73,8 @@ kotlin {
             //implementation(project(":yunext-context"))
             //implementation(libs.yunext.context)
             implementation(libs.bundles.yunext)
-            implementation(projects.yunextCommon)
+            //implementation(projects.yunextCommon)
+            implementation(projects.yunextBle)
 
 
         }
@@ -110,9 +113,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -144,3 +149,28 @@ compose.desktop {
 //    packageOfResClass = "om.yunext.kotlin.kmp.lib.sample"
 //    generateResClass = always
 //}
+
+
+project.beforeEvaluate {
+    println("-x>>>>>>> ${project.name} beforeEvaluate-------")
+}
+
+project.afterEvaluate {
+    println("-x>>>>>>> ${project.name} afterEvaluate-------")
+}
+
+
+///
+val p = TestPlugin()
+class TestPlugin:Plugin<Project>{
+    override fun apply(target: Project) {
+        println("自定义插件 ¥")
+        project.task("myTask"){
+            doFirst{
+                println("自定义task doFirst")
+            }
+        }
+    }
+}
+
+

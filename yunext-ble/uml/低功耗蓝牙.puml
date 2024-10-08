@@ -1,0 +1,247 @@
+@startuml
+!include lib_eventstorming.puml
+
+Command("SlaveSetting") [
+    Slave设置
+    --field--
+    广播名称
+    广播服务
+    设备服务Service/Characteristic/Descriptor
+    超时时间
+    --rule--
+    1.设置广播名称
+    2.设置广播服务
+    3.设置设备服务Service/Characteristic/Descriptor
+    4.超时时间
+    --event--
+    1.名称已设置
+    2.广播服务已设置
+    3.设备服务已设置Service/Characteristic/Descriptor
+    4.超时时间已设置
+]
+
+Command("SlaveStartBroadcast") [
+    Slave开始广播
+    --field--
+    --rule--
+    1.开启广播，等待连接。
+    --event--
+    正在广播
+]
+
+Command("SlaveStopBroadcast") [
+    Slave停止广播
+    --field--
+    --rule--
+    1.停止广播
+    --event--
+    停止广播
+]
+
+Command("SlaveHandleData") [
+    Slave处理数据
+    --field--
+    Characteristic
+    当前连接设备
+    --rule--
+    1.收到master的数据，根据业务处理。
+    --event--
+    处理结果
+]
+
+Command("SlaveHandleConnect") [
+    Slave处理连接
+    --field--
+    上一个连接的设备
+    连接设备
+    --rule--
+    1.保存连接的设备，移除上一个连接的设备
+    --event--
+    新的设备已连接
+]
+
+Command("SlaveResponse") [
+    Slave回应数据
+    --field--
+    Characteristic
+    当前连接设备
+    --rule--
+    1.收到Master数据后回应
+    --event--
+    已回应
+]
+
+Command("SlaveWrite") [
+    Slave发送数据
+    --field--
+    Characteristic
+    当前连接设备
+    配置
+    --rule--
+    1.发送数据给Master
+    --event--
+    已发送
+]
+
+DomainEvent("SlaveSettingEvent") [
+    已配置
+    --field--
+    广播名称
+    广播服务
+    设备服务Service/Characteristic/Descriptor
+    超时时间
+]
+
+DomainEvent("SlaveBroadcastingEvent") [
+    正在广播中
+    --field--
+    broadcasting
+]
+
+DomainEvent("SlaveBroadcastStoppedEvent") [
+    停止广播
+    --field--
+    broadcastStopped
+]
+
+DomainEvent("SlaveConnectedEvent") [
+    已连接
+    --field--
+    设备
+]
+
+DomainEvent("SlaveDisconnectedEvent") [
+    已断开连接
+    --field--
+    设备？
+]
+
+DomainEvent("SlaveResponseEvent") [
+    已回复
+    --field--
+    设备
+    Characteristic
+
+]
+
+DomainEvent("SlaveWriteEvent") [
+    已发送
+    --field--
+    设备
+    Characteristic
+
+]
+
+DomainEvent("SlaveHandleDataEvent") [
+    已处理数据
+    --field--
+    处理接口
+    设备
+]
+
+DomainEvent("SlaveHandleConnectEvent") [
+    已处理连接
+    --field--
+    设备
+    Characteristic
+]
+
+Aggregate("PlatformSlave")[
+    PlatformSlave
+    --id--
+    设备名称
+    --field--
+    状态
+    broadcaster
+    处理数据接口
+    --method--
+    设置
+    开始广播
+    停止广播
+    回复
+    发送数据
+    设置处理数据接口
+    close
+]
+
+Aggregate("PlatformBroadcaster")[
+    PlatformBroadcaster
+    --id--
+    设备名称
+    --field--
+    状态
+    广播服务
+    设备服务
+    超时时间
+    --method--
+    设置
+    开始广播
+    停止广播
+]
+
+
+
+
+
+Policy("SlaveConnectPolicy") [
+    Slave设备连接
+    --rule--
+    1.当设备连接时，处理。
+]
+Policy("SlaveDataPolicy") [
+    Slave数据
+    --rule--
+    1.当收到数据，处理。
+]
+
+Person("SlavePerson") [
+   slave
+]
+
+Person("SlaveConnectPerson") [
+   slave连接
+]
+
+UserInterface("HandlerInterface")[
+    处理数据
+    -- role --
+    动态处理数据
+]
+
+SlaveConnectPerson--down-->SlaveConnectPolicy
+SlaveConnectPolicy--down-->SlaveHandleConnect
+
+SlaveConnectPerson--down-->SlaveDataPolicy
+SlaveDataPolicy--down-->SlaveHandleData
+
+SlavePerson--down-->SlaveSetting
+SlavePerson--down-->SlaveStartBroadcast
+SlavePerson--down-->SlaveStopBroadcast
+SlavePerson--down-->SlaveResponse
+SlavePerson--down-->SlaveWrite
+
+SlaveSetting--down-->PlatformSlave
+SlaveStartBroadcast--down-->PlatformSlave
+SlaveStopBroadcast--down-->PlatformSlave
+SlaveHandleData--down-->PlatformSlave
+SlaveHandleConnect--down-->PlatformSlave
+SlaveResponse--down-->PlatformSlave
+SlaveWrite--down-->PlatformSlave
+
+PlatformBroadcaster--down-->SlaveSettingEvent
+PlatformBroadcaster--down-->SlaveBroadcastingEvent
+PlatformBroadcaster--down-->SlaveBroadcastStoppedEvent
+PlatformBroadcaster--down-->SlaveConnectedEvent
+PlatformBroadcaster--down-->SlaveDisconnectedEvent
+PlatformSlave--down-->SlaveResponseEvent
+PlatformSlave--down-->SlaveWriteEvent
+PlatformSlave--down-->SlaveHandleDataEvent
+PlatformSlave--down-->SlaveHandleConnectEvent
+
+
+PlatformSlave o--> PlatformBroadcaster
+PlatformSlave o--> HandlerInterface
+
+
+
+@enduml
