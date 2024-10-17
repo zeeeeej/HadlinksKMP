@@ -20,17 +20,60 @@ interface PlatformBluetoothGattDescriptor : PlatformBluetoothGattValue {
         ;
     }
 
+    sealed class Value(val value: ByteArray?) {
+        data object EnableNotificationValue :
+            Value(PlatformBluetoothGattDescriptor.EnableNotificationValue) {
+            @OptIn(ExperimentalStdlibApi::class)
+            override fun toString(): String {
+                return "EnableNotification(${value?.toHexString()})"
+            }
+        }
+
+        data object EnableIndicationValue :
+            Value(PlatformBluetoothGattDescriptor.EnableIndicationValue) {
+            @OptIn(ExperimentalStdlibApi::class)
+            override fun toString(): String {
+                return "EnableIndication(${value?.toHexString()})"
+            }
+        }
+
+        data object DisableNotificationValue :
+            Value(PlatformBluetoothGattDescriptor.DisableNotificationValue) {
+            @OptIn(ExperimentalStdlibApi::class)
+            override fun toString(): String {
+                return "DisableNotification(${value?.toHexString()})"
+            }
+        }
+
+        class NaN(value: ByteArray?) : Value(value) {
+
+            @OptIn(ExperimentalStdlibApi::class)
+            override fun toString(): String {
+                return "NaN(${value?.toHexString()})"
+            }
+        }
+
+    }
+
     companion object {
         /* Value used to enable notification for a client configuration descriptor */
-        val EnableNotificationValue = byteArrayOf(0x01, 0x00)
+        private val EnableNotificationValue = byteArrayOf(0x01, 0x00)
 
         /* Value used to enable indication for a client configuration descriptor */
-        val EnableIndicationValue = byteArrayOf(0x02, 0x00)
+        private val EnableIndicationValue = byteArrayOf(0x02, 0x00)
 
         /* Value used to disable notifications or indications */
-        val DisableNotificationValue = byteArrayOf(0x00, 0x00)
+        private val DisableNotificationValue = byteArrayOf(0x00, 0x00)
     }
 }
+
+val PlatformBluetoothGattDescriptor.status: PlatformBluetoothGattDescriptor.Value
+    get() = when {
+        this.value.contentEquals(PlatformBluetoothGattDescriptor.Value.DisableNotificationValue.value) -> PlatformBluetoothGattDescriptor.Value.DisableNotificationValue
+        this.value.contentEquals(PlatformBluetoothGattDescriptor.Value.EnableNotificationValue.value) -> PlatformBluetoothGattDescriptor.Value.EnableNotificationValue
+        this.value.contentEquals(PlatformBluetoothGattDescriptor.Value.EnableIndicationValue.value) -> PlatformBluetoothGattDescriptor.Value.EnableIndicationValue
+        else -> PlatformBluetoothGattDescriptor.Value.NaN(this.value)
+    }
 
 val PlatformBluetoothGattDescriptor.Permission.value: UInt
     get() = when (this) {
@@ -48,5 +91,7 @@ val PlatformBluetoothGattDescriptor.Permission.value: UInt
 expect fun bluetoothGattDescriptor(
     uuid: Uuid,
     permissions: Array<PlatformBluetoothGattDescriptor.Permission>,
-    value:ByteArray?
+    value: ByteArray?
 ): PlatformBluetoothGattDescriptor
+
+const val NotifyDescriptorUUID = "00002902-0000-1000-8000-00805f9b34fb"

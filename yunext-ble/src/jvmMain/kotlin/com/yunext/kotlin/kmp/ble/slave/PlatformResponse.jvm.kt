@@ -1,3 +1,3 @@
 package com.yunext.kotlin.kmp.ble.slave
 
-actual class PlatformResponse : PlatformBluetoothWork
+actual class PlatformResponse

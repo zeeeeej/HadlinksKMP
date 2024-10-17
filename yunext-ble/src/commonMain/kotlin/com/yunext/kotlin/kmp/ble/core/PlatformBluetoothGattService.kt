@@ -27,3 +27,30 @@ expect fun bluetoothGattService(
     includeServices: Array<PlatformBluetoothGattService>,
     characteristics: Array<PlatformBluetoothGattCharacteristic>,
 ): PlatformBluetoothGattService
+
+
+fun List<PlatformBluetoothGattService>.findService(uuid: String): PlatformBluetoothGattService? {
+    if (this.isEmpty()) return null
+    return this.singleOrNull() {
+        @OptIn(ExperimentalUuidApi::class)
+        it.uuid.toString() == uuid
+    }
+}
+
+fun PlatformBluetoothGattService.findCharacteristic(uuid: String): PlatformBluetoothGattCharacteristic? {
+    val chs = this.characteristics
+    if (chs.isEmpty()) return null
+    return chs.singleOrNull {
+        @OptIn(ExperimentalUuidApi::class)
+        it.uuid.toString() == uuid
+    }
+}
+
+fun PlatformBluetoothGattCharacteristic.findDescriptor(uuid: String): PlatformBluetoothGattDescriptor? {
+    val descriptors = this.descriptors
+    if (descriptors.isEmpty()) return null
+    return descriptors.singleOrNull {
+        @OptIn(ExperimentalUuidApi::class)
+        it.uuid.toString() == uuid
+    }
+}

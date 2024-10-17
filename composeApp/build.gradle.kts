@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -60,6 +62,7 @@ kotlin {
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.bundles.ktor.server)
 
         }
         commonMain.dependencies {
@@ -109,6 +112,11 @@ android {
         versionName = "1.0"
     }
     packaging {
+        // fix 12 files found with path 'META-INF/INDEX.LIST'. Adding a packagingOptions block may help, please refer to
+        packagingOptions {
+            pickFirst("META-INF/INDEX.LIST")
+            pickFirst("META-INF/io.netty.versions.properties")
+        }
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -155,19 +163,52 @@ project.beforeEvaluate {
     println("-x>>>>>>> ${project.name} beforeEvaluate-------")
 }
 
-project.afterEvaluate {
-    println("-x>>>>>>> ${project.name} afterEvaluate-------")
-}
+//val finalTaskName = "finalTask"
+//// 定义一个自定义任务
+//tasks.register("finalTask") {
+//    doLast {
+//        println("======> finalTask 所有任务执行完毕后的自定义任务。")
+//        // 在这里添加你希望在所有任务执行完毕后执行的代码
+//        FileInputStream("release/composeApp-release.apk").use { input ->
+//            FileOutputStream("src/androidMain/assets/composeApp-release.apk").use { out ->
+//                out.write(input.readBytes())
+//            }
+//        }
+//    }
+//}
+//
+//project.afterEvaluate {
+//    println("======> ${project.name} afterEvaluate-------")
+//    // 创建一个任务，该任务依赖于所有已知的任务
+//    tasks.register("allTasksComplete") {
+//        // 依赖于所有已知的任务（除了finalTask）
+//        dependsOn(tasks.names.filter { it != finalTaskName  && it!="allTasksComplete"})
+//        doLast {
+//            println("======>allTasksComplete 所有任务都已完成。现在执行${finalTaskName}。")
+//        }
+//    }
+//
+//    // 将finalTask设置为依赖于allTasksComplete任务
+//    tasks.named(finalTaskName).configure {
+//        dependsOn("allTasksComplete")
+//    }
+//}
+
+
 
 
 ///
 val p = TestPlugin()
-class TestPlugin:Plugin<Project>{
+
+class TestPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         println("自定义插件 ¥")
-        project.task("myTask"){
-            doFirst{
+        project.task("myTask") {
+            doFirst {
                 println("自定义task doFirst")
+            }
+            doLast {
+
             }
         }
     }

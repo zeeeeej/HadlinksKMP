@@ -2,19 +2,27 @@ package com.yunext.kotlin.kmp.ble.slave
 
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothContext
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattCharacteristic
+import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
+import com.yunext.kotlin.kmp.ble.history.BluetoothHistoryOwner
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 
-interface PlatformSlave {
+interface PlatformSlave{
     val eventChannel: Channel<PlatformSlaveEvent>
     val slaveState: StateFlow<SlaveState>
+    val history: BluetoothHistoryOwner
     fun updateSetting(setting: SlaveSetting)
     fun startBroadcast()
     fun stopBroadcast()
     fun response(response: PlatformResponse, success: Boolean)
-    fun write(param: SlaveWriteParam)
+    fun notify(param: SlaveWriteParam)
     fun close()
 }
+
+expect fun PlatformSlave(
+    context: PlatformBluetoothContext,
+    setting: SlaveSetting
+): PlatformSlave
 
 data class SlaveWriteParam(
     val characteristic: PlatformBluetoothGattCharacteristic,
@@ -41,8 +49,3 @@ data class SlaveWriteParam(
         return result
     }
 }
-
-expect fun PlatformSlave(
-    context: PlatformBluetoothContext,
-    setting: SlaveSetting
-): PlatformSlave

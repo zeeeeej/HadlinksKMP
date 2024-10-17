@@ -20,6 +20,7 @@ compose-plugin = "1.6.10"
 junit = "4.13.2"
 ktor = "2.3.11"
 ktor-wasm = "3.2.0"
+navigation = "2.8.0-alpha08"
 
 
 logback = "1.5.6"
@@ -33,6 +34,7 @@ zhongguose = "0.0.1"
 zeeeeej = "1.0.2"
 task-tree = "2.1.1"
 activity = "1.9.0"
+fastble = "2.4.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -48,7 +50,13 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
-# [ktor] https://ktor.io/
+navigation-common = { module = "org.jetbrains.androidx.navigation:navigation-common", version.ref = "navigation" }
+navigation-runtime = { module = "org.jetbrains.androidx.navigation:navigation-runtime", version.ref = "navigation" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
+
+
+
+# [ktor] https://ktnavigationor.io/
 # --server
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
@@ -101,6 +109,10 @@ androidx-lifecycle-common-java8 = { module = "androidx.lifecycle:lifecycle-commo
 androidx-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "android-lifecycle" }
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "android-lifecycle" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "android-lifecycle" }
+# [第三方]
+# FastBle https://github.com/Jasonchenlijian/FastBle
+fastble = { module = "com.github.Jasonchenlijian:FastBle", version.ref = "fastble" }
 [plugins]
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -113,6 +125,7 @@ ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 task-tree = { id = "com.dorongold.task-tree", version.ref = "task-tree" }
 [bundles]
+navigation = ["navigation-common", "navigation-compose","navigation-runtime"]
 yunext = ["yunext-context", "yunext-common", "zeeeeej-zhongguohong", "zeeeeej-zhongguohong-compose"]
 androidx-lifecycle = ["androidx-lifecycle-viewmodel","androidx-lifecycle-viewmodel-ktx",
     "androidx-lifecycle-livedata-ktx", "androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-savedstate",
@@ -120,4 +133,6 @@ androidx-lifecycle = ["androidx-lifecycle-viewmodel","androidx-lifecycle-viewmod
     "androidx-lifecycle-compiler",
     "androidx-lifecycle-service",
     "androidx-lifecycle-process",
+    "lifecycle-viewmodel-compose",
 ]
+ktor-server=["ktor-server-core","ktor-server-netty","ktor-server-content-negotiation-jvm","ktor-serialization-kotlinx-json-jvm"]

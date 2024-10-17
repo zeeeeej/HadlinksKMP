@@ -1,5 +1,6 @@
 package com.yunext.kotlin.kmp.ble.core
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothManager
@@ -79,7 +80,7 @@ internal class AndroidBluetoothContext(context: Context) : PlatformBluetoothCont
             BluetoothAdvertise -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
-                    android.Manifest.permission.BLUETOOTH_ADVERTISE
+                    Manifest.permission.BLUETOOTH_ADVERTISE
                 } else {
                     null
                 }
@@ -88,7 +89,14 @@ internal class AndroidBluetoothContext(context: Context) : PlatformBluetoothCont
 
             BluetoothConnect -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
-                android.Manifest.permission.BLUETOOTH_CONNECT
+                Manifest.permission.BLUETOOTH_CONNECT
+            } else {
+                null
+            }
+
+            Location -> Manifest.permission.ACCESS_FINE_LOCATION
+            BluetoothScan -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Manifest.permission.BLUETOOTH_SCAN
             } else {
                 null
             }
@@ -149,7 +157,7 @@ internal class AndroidBluetoothContext(context: Context) : PlatformBluetoothCont
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     val status = ContextCompat.checkSelfPermission(
                         activity,
-                        android.Manifest.permission.BLUETOOTH_ADVERTISE
+                        Manifest.permission.BLUETOOTH_ADVERTISE
                     )
                     if (status == PackageManager.PERMISSION_GRANTED) {
                         PlatformPermissionStatus.Granted
@@ -162,13 +170,39 @@ internal class AndroidBluetoothContext(context: Context) : PlatformBluetoothCont
             BluetoothConnect -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val status = ContextCompat.checkSelfPermission(
                     activity,
-                    android.Manifest.permission.BLUETOOTH_CONNECT
+                    Manifest.permission.BLUETOOTH_CONNECT
                 )
                 if (status == PackageManager.PERMISSION_GRANTED) {
                     PlatformPermissionStatus.Granted
                 } else PlatformPermissionStatus.Defined
             } else {
                 PlatformPermissionStatus.Granted
+            }
+
+            Location -> {
+                val status = ContextCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                if (status == PackageManager.PERMISSION_GRANTED) {
+                    PlatformPermissionStatus.Granted
+                } else PlatformPermissionStatus.Defined
+            }
+
+            BluetoothScan -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val status = ContextCompat.checkSelfPermission(
+                        activity,
+                        Manifest.permission.BLUETOOTH_SCAN
+                    )
+                    if (status == PackageManager.PERMISSION_GRANTED) {
+                        PlatformPermissionStatus.Granted
+                    } else PlatformPermissionStatus.Defined
+                } else {
+                    // TODO("VERSION.SDK_INT < S")
+                    PlatformPermissionStatus.Granted
+                }
+
             }
         }
     }

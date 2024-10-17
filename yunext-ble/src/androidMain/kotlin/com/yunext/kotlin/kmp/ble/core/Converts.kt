@@ -9,6 +9,7 @@ import android.os.Build
 import com.yunext.kotlin.kmp.ble.util.toUUID
 import com.yunext.kotlin.kmp.ble.util.toUuid
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 //<editor-fold desc="/* native to platform */">
 
@@ -54,7 +55,7 @@ internal fun BluetoothGattService.asPlatformBase(): PlatformBluetoothGattService
 internal fun BluetoothGattCharacteristic.asPlatformBase(): PlatformBluetoothGattCharacteristic {
     val uuid = this.uuid.toUuid()
     val permissions = characteristicPermissionOf(this.permissions)
-    val properties = characteristicPropertyOf(this.permissions)
+    val properties = characteristicPropertyOf(this.properties)
     val descriptors = this.descriptors.map {
         it.asPlatformBase()
     }
@@ -132,6 +133,7 @@ private fun descriptorPermissionOf(value: Int): Array<PlatformBluetoothGattDescr
 //</editor-fold>
 
 //<editor-fold desc="/* platform to native */">
+
 @OptIn(ExperimentalUuidApi::class)
 internal fun PlatformBluetoothGattService.asNativeBase(): BluetoothGattService {
     val uuid = this.uuid.toUUID()
@@ -155,11 +157,24 @@ internal fun PlatformBluetoothGattCharacteristic.asNativeBase(): BluetoothGattCh
     val descriptors = descriptors.map {
         it.asNativeBase()
     }
-    return BluetoothGattCharacteristic(uuid, properties, permissions).apply {
-        descriptors.forEach {
-            this.addDescriptor(it)
-        }
+    val result = BluetoothGattCharacteristic(uuid, properties, permissions)
+    descriptors.forEach {
+        result.addDescriptor(it)
     }
+
+    if (this.properties.contains(PlatformBluetoothGattCharacteristic.Property.Notify)
+        && !result.descriptors.any {
+            it.uuid.toString() == NotifyDescriptorUUID
+        }
+    ) {
+        val notifyDescriptor = bluetoothGattDescriptor(
+            Uuid.parse(NotifyDescriptorUUID), arrayOf(
+                PlatformBluetoothGattDescriptor.Permission.PermissionWrite,
+            ), null
+        )
+        result.addDescriptor(notifyDescriptor.asNativeBase())
+    }
+    return result
 }
 
 private fun characteristicPermissionNativeOf(permissions: Array<PlatformBluetoothGattCharacteristic.Permission>): Int {

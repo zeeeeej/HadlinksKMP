@@ -6,5 +6,8 @@ interface PlatformBluetoothDevice {
 
 }
 
+val PlatformBluetoothDevice.display:String
+    get() = "$name($address)"
+
 expect fun bluetoothDevice(name:String, address:String):PlatformBluetoothDevice
 

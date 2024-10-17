@@ -8,35 +8,73 @@ import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.AdvertisingSetCallback
 import android.content.Context
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattService
+import com.yunext.kotlin.kmp.ble.master.masterScope
 import com.yunext.kotlin.kmp.ble.util.d
-import com.yunext.kotlin.kmp.ble.util.i
 import com.yunext.kotlin.kmp.ble.util.w
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
 
-internal sealed interface AdvertiserEvent{
-    data object OnSuccess:AdvertiserEvent
-    data class OnFail(val error:String):AdvertiserEvent
+internal sealed interface AdvertiserEvent {
+    data object OnSuccess : AdvertiserEvent
+    data class OnFail(val error: String) : AdvertiserEvent
 }
 
-internal class AndroidPlatformAdvertiser(context: Context, private val callback: (AdvertiserEvent) -> Unit) :
-    PlatformBroadcaster {
+internal class AndroidPlatformAdvertiser(
+    context: Context,
+    private val callback: (AdvertiserEvent) -> Unit
+) :
+    PlatformAdvertiser {
+
+    private val hasRetry: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    private var hasRetryJob: Job? = null
     private val bluetoothManager: BluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val adapter = bluetoothManager.adapter
     private val bluetoothLeAdvertiser = adapter.bluetoothLeAdvertiser
         ?: throw IllegalStateException("bluetoothLeAdvertiser is null")
+
+
+    private fun doTask(task: () -> Unit) {
+        masterScope.launch() {
+            task()
+        }
+    }
+
     private var advertiseCallback: AdvertiseCallback = object : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             super.onStartSuccess(settingsInEffect)
-            d("[AndroidPlatformAdvertiser]AdvertiseCallback onStartSuccess settingsInEffect:$settingsInEffect ")
-            callback.invoke(AdvertiserEvent.OnSuccess)
+            doTask{
+                d("[AndroidPlatformAdvertiser]AdvertiseCallback onStartSuccess settingsInEffect:$settingsInEffect ")
+                hasRetryJob?.cancel()
+                hasRetryJob = null
+                hasRetryJob= masterScope.launch {
+                    if (hasRetry.value){
+                        w("直接广播成功了")
+                        callback.invoke(AdvertiserEvent.OnSuccess)
+                    }else{
+                        w("重新广播")
+                        stop()
+                        val (deviceName,broadcastService,broadcastTimeout) = tmp?:return@launch
+                        hasRetry.value = true
+                        delay(500)
+                        startInternal( deviceName, broadcastService, broadcastTimeout *2L )
+                    }
+                }
+            }
+
+
         }
 
         override fun onStartFailure(errorCode: Int) {
             super.onStartFailure(errorCode)
-            val msg = errorCode.msg()
-            w("[AndroidPlatformAdvertiser]AdvertiseCallback onStartFailure $errorCode:${msg} ")
-            callback.invoke(AdvertiserEvent.OnFail(msg))
+            doTask {
+                val msg = errorCode.msg()
+                w("[AndroidPlatformAdvertiser]AdvertiseCallback onStartFailure $errorCode:${msg} ")
+                callback.invoke(AdvertiserEvent.OnFail(msg))
+            }
         }
 
         private fun Int.msg(): String {
@@ -54,6 +92,8 @@ internal class AndroidPlatformAdvertiser(context: Context, private val callback:
 
     }
 
+    private var tmp:Triple<String,PlatformBluetoothGattService,Long> ? = null
+
     @SuppressLint("MissingPermission")
     fun start(
         deviceName: String,
@@ -61,12 +101,25 @@ internal class AndroidPlatformAdvertiser(context: Context, private val callback:
         timeout: Long,
     ) {
         d("[AndroidPlatformAdvertiser]start dest:$deviceName,broadcastService:$broadcastService")
+        hasRetry.value = false
+        hasRetryJob?.cancel()
+        hasRetryJob = null
+        tmp = Triple(deviceName,broadcastService,timeout)
+        startInternal(deviceName, broadcastService, timeout)
+    }
 
+    @SuppressLint("MissingPermission")
+    private fun startInternal(
+        deviceName: String,
+        broadcastService: PlatformBluetoothGattService,
+        timeout: Long,
+    ) {
+        adapter.setName(deviceName)
         val advertiseSettings =
             AdvertiseSettings.Builder()
                 .setAdvertiseMode(AdvertiseSettings.ADVERTISE_TX_POWER_LOW)
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
-                .setTimeout(timeout.toInt())
+                .setTimeout(Math.min(180000,timeout.toInt()))
                 .setConnectable(true)
                 .build()
         val advertiseData =
@@ -104,8 +157,14 @@ internal class AndroidPlatformAdvertiser(context: Context, private val callback:
         } catch (e: Exception) {
             w("[AndroidPlatformAdvertiser]stopBroadcast $e")
         } finally {
-
         }
+    }
+
+    fun close(){
+        stop()
+        hasRetryJob?.cancel()
+        hasRetryJob = null
+        hasRetry.value = false
     }
 
 }

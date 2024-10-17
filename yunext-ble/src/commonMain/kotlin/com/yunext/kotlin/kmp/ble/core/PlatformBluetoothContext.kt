@@ -22,6 +22,8 @@ expect fun platformBluetoothContext(): PlatformBluetoothContext
 enum class PlatformPermission {
     BluetoothAdvertise,
     BluetoothConnect,
+    Location,
+    BluetoothScan
     ;
 }
 

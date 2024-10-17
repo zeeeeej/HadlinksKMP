@@ -72,6 +72,7 @@ kotlin {
 //            implementation(projects.yunextContext)
             implementation(libs.bundles.yunext)
             implementation(projects.yunextBle)
+            implementation(libs.bundles.navigation)
         }
 
         iosMain.dependencies {

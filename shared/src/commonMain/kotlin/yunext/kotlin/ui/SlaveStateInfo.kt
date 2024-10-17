@@ -1,6 +1,7 @@
 package yunext.kotlin.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -8,11 +9,14 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,17 +25,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import color
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattCharacteristic
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattDescriptor
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattService
+import com.yunext.kotlin.kmp.ble.core.status
 import com.yunext.kotlin.kmp.ble.slave.SlaveSetting
 import com.yunext.kotlin.kmp.ble.slave.SlaveState
 import com.yunext.kotlin.kmp.ble.util.display
+import randomZhongGuoSe
+import yunext.kotlin.util.randomBG
 import kotlin.uuid.ExperimentalUuidApi
 
 private object Defaults {
@@ -42,20 +51,83 @@ private object Defaults {
 }
 
 @Composable
-internal fun SlaveStateInfo(modifier: Modifier = Modifier.fillMaxWidth(), state: SlaveState) {
+internal fun SlaveStateInfo(
+    modifier: Modifier = Modifier.fillMaxWidth(), state: SlaveState,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+) {
     Column(modifier) {
         Text("【Slave状态】", style = TextStyle.Default.copy(fontWeight = FontWeight.Bold))
         SlaveSettingInfo(setting = state.setting)
-        Text(
-            text = "[${
-                when (state) {
-                    is SlaveState.AdvertiseSuccess -> "广播成功"
-                    is SlaveState.Connected -> "已连接${state.device.address}/${state.device.name}"
-                    is SlaveState.Idle -> "初始化"
-                    is SlaveState.ServerOpened -> "服务已开启"
+        Column() {
+
+            Text(
+                modifier = Modifier.randomBG().clickable() {
+                    when (state) {
+                        is SlaveState.AdvertiseSuccess -> onStop()
+                        is SlaveState.Connected -> onStop()
+                        is SlaveState.Idle -> onStart()
+                        is SlaveState.ServerOpened -> onStop()
+                    }
+                },
+                text = "[${
+                    when (val s = state) {
+                        is SlaveState.AdvertiseSuccess -> "添加服务中..."
+                        is SlaveState.Connected -> "已连接${s.device.address}/${s.device.name}"
+                        is SlaveState.Idle -> "初始化"
+                        is SlaveState.ServerOpened -> "等待连接中..."
+                    }
+                }]"
+            )
+        }
+        when (state) {
+            is SlaveState.AdvertiseSuccess -> {
+
+                Text(
+                    text = "[广播成功]"
+                )
+            }
+
+            is SlaveState.Connected -> {
+
+                Column(Modifier.fillMaxWidth().heightIn(max = 256.dp)) {
+                    "已连接${state.device.address}/${state.device.name}"
+                    PlatformBluetoothGattServicesInfo(
+                        services = state.services.toTypedArray(),
+                        expend = true,
+                        onNotify = { service, ch ->
+
+                        }
+                    ) {
+                        Text("服务详情：")
+                    }
                 }
-            }]"
-        )
+            }
+
+            is SlaveState.Idle -> {
+                Text("初始化")
+
+            }
+
+            is SlaveState.ServerOpened -> {
+
+                Column(
+                    Modifier.fillMaxWidth().heightIn(max = 256.dp)
+                        .randomBG()
+                ) {
+                    Text("服务已开启")
+                    PlatformBluetoothGattServicesInfo(
+                        services = state.services.toTypedArray(),
+                        expend = true,
+                        onNotify = { service, ch ->
+
+                        }
+                    ) {
+                        Text("【服务详情】")
+                    }
+                }
+            }
+        }
     }
 
 }
@@ -77,7 +149,8 @@ internal fun SlaveSettingInfo(modifier: Modifier = Modifier.fillMaxWidth(), sett
                     Text("广播Service")
                     PlatformBluetoothGattServiceInfo(
                         service = setting.broadcastService,
-                        expend = false
+                        expend = false,
+                        onNotify = {}
                     )
                 }
 
@@ -94,7 +167,7 @@ internal fun SlaveSettingInfo(modifier: Modifier = Modifier.fillMaxWidth(), sett
                         })
                 }
             }
-        }
+        }, onNotify = { _, _ -> }
     )
 }
 
@@ -102,15 +175,18 @@ internal fun SlaveSettingInfo(modifier: Modifier = Modifier.fillMaxWidth(), sett
 @Composable
 fun PlatformBluetoothGattServicesInfo(
     modifier: Modifier = Modifier, services: Array<PlatformBluetoothGattService>, expend: Boolean,
+    onNotify: (PlatformBluetoothGattService, PlatformBluetoothGattCharacteristic) -> Unit,
     header: @Composable () -> Unit
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(modifier = modifier.randomBG(0.dp)) {
         item {
             header()
         }
         @OptIn(ExperimentalUuidApi::class)
         items(services, { it.uuid.toString() }) {
-            PlatformBluetoothGattServiceInfo(service = it, expend = expend)
+            PlatformBluetoothGattServiceInfo(service = it, expend = expend, onNotify = { ch ->
+                onNotify.invoke(it, ch)
+            })
         }
     }
 }
@@ -119,6 +195,7 @@ fun PlatformBluetoothGattServicesInfo(
 internal fun PlatformBluetoothGattServiceInfo(
     modifier: Modifier = Modifier.fillMaxWidth(),
     service: PlatformBluetoothGattService,
+    onNotify: (PlatformBluetoothGattCharacteristic) -> Unit,
     expend: Boolean
 ) {
     var showList by remember(expend) { mutableStateOf(expend) }
@@ -127,12 +204,12 @@ internal fun PlatformBluetoothGattServiceInfo(
             @OptIn(ExperimentalUuidApi::class)
             Text(service.uuid.toString(), style = Defaults.Style_1.copy(Color.Red))
             Text(
-                "(${service.characteristics.size}个)",
+                "${service.characteristics.size}个",
                 style = Defaults.Style_1,
                 modifier = Modifier.clickable {
                     showList = !showList
                 })
-            Text("<<${service.serviceType.name.take(1).uppercase()}>>", style = Defaults.Style_1)
+            Text("[${service.serviceType.name.take(1).uppercase()}]", style = Defaults.Style_1)
         }
         if (service.characteristics.isNotEmpty()) {
             AnimatedVisibility(showList) {
@@ -141,7 +218,9 @@ internal fun PlatformBluetoothGattServiceInfo(
                     service.characteristics.forEach {
                         PlatformBluetoothGattCharacteristicInfo(
                             characteristic = it,
-                            expend = expend
+                            expend = expend, onNotify = {
+                                onNotify.invoke(it)
+                            }
                         )
                     }
                 }
@@ -154,6 +233,7 @@ internal fun PlatformBluetoothGattServiceInfo(
 internal fun PlatformBluetoothGattCharacteristicInfo(
     modifier: Modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
     characteristic: PlatformBluetoothGattCharacteristic,
+    onNotify: () -> Unit,
     expend: Boolean
 ) {
     var showList by remember(expend) { mutableStateOf(expend) }
@@ -179,7 +259,11 @@ internal fun PlatformBluetoothGattCharacteristicInfo(
         AnimatedVisibility(showDetail) {
 //        if (showDetail) {
             Column {
-                Text(characteristic.properties.display, style = Defaults.Style_1)
+                Text(
+                    characteristic.properties.display,
+                    style = Defaults.Style_1,
+                    modifier = Modifier.clickable(onClick = onNotify)
+                )
                 Text(characteristic.permissions.display, style = Defaults.Style_1)
             }
         }
@@ -217,7 +301,14 @@ internal fun PlatformBluetoothGattDescriptorInfo(
 
         AnimatedVisibility(showDetail) {
 //        if (showDetail) {
-            Text(descriptor.permissions.display, style = Defaults.Style_1)
+            Row {
+                Text(descriptor.permissions.display, style = Defaults.Style_1)
+                Text(
+                    descriptor.status.toString(),
+                    style = Defaults.Style_1.copy(color = Color.Red)
+                )
+            }
+
 
         }
     }
@@ -226,62 +317,62 @@ internal fun PlatformBluetoothGattDescriptorInfo(
 
 // by flow
 
-@Composable
-fun PlatformBluetoothGattServicesInfoByFlow(
-    modifier: Modifier = Modifier, services: Array<PlatformBluetoothGattService>, expend: Boolean
-) {
-    @OptIn(ExperimentalLayoutApi::class)
-    FlowRow(
-        modifier = modifier
-            //FlowRow一定是使用verticalScroll横向滚动才有item填充满的效果
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize()
-            .padding(15.dp)
-    ) {
-        services.forEach {
-            PlatformBluetoothGattServiceInfo(service = it, expend = expend)
-        }
+//@Composable
+//fun PlatformBluetoothGattServicesInfoByFlow(
+//    modifier: Modifier = Modifier, services: Array<PlatformBluetoothGattService>, expend: Boolean
+//) {
+//    @OptIn(ExperimentalLayoutApi::class)
+//    FlowRow(
+//        modifier = modifier
+//            //FlowRow一定是使用verticalScroll横向滚动才有item填充满的效果
+//            .verticalScroll(rememberScrollState())
+//            .fillMaxSize()
+//            .padding(15.dp)
+//    ) {
+//        services.forEach {
+//            PlatformBluetoothGattServiceInfo(service = it, expend = expend, onNotify = )
+//        }
+//
+//    }
+//}
 
-    }
-}
-
-@Composable
-internal fun PlatformBluetoothGattServiceInfoByFlow(
-    modifier: Modifier = Modifier.fillMaxWidth(),
-    service: PlatformBluetoothGattService,
-    expend: Boolean
-) {
-
-    var showList by remember(expend) { mutableStateOf(expend) }
-    Column(modifier = modifier) {
-        Row {
-            @OptIn(ExperimentalUuidApi::class)
-            Text(service.uuid.toString(), style = Defaults.Style_1.copy(Color.Red))
-            Text(
-                "(${service.characteristics.size}个)",
-                style = Defaults.Style_1,
-                modifier = Modifier.clickable {
-                    showList = !showList
-                })
-            Text("<<${service.serviceType.name.take(1).uppercase()}>>", style = Defaults.Style_1)
-        }
-        if (service.characteristics.isNotEmpty()) {
-            AnimatedVisibility(showList) {
-                @OptIn(ExperimentalLayoutApi::class)
-                FlowRow(
-                    modifier = modifier
-                        //FlowRow一定是使用verticalScroll横向滚动才有item填充满的效果
-//                        .verticalScroll(rememberScrollState())
-                        .fillMaxSize()
-                ) {
-                    service.characteristics.forEach {
-                        PlatformBluetoothGattCharacteristicInfo(
-                            characteristic = it,
-                            expend = expend
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+//@Composable
+//internal fun PlatformBluetoothGattServiceInfoByFlow(
+//    modifier: Modifier = Modifier.fillMaxWidth(),
+//    service: PlatformBluetoothGattService,
+//    expend: Boolean
+//) {
+//
+//    var showList by remember(expend) { mutableStateOf(expend) }
+//    Column(modifier = modifier) {
+//        Row {
+//            @OptIn(ExperimentalUuidApi::class)
+//            Text(service.uuid.toString(), style = Defaults.Style_1.copy(Color.Red))
+//            Text(
+//                "(${service.characteristics.size}个)",
+//                style = Defaults.Style_1,
+//                modifier = Modifier.clickable {
+//                    showList = !showList
+//                })
+//            Text("<<${service.serviceType.name.take(1).uppercase()}>>", style = Defaults.Style_1)
+//        }
+//        if (service.characteristics.isNotEmpty()) {
+//            AnimatedVisibility(showList) {
+//                @OptIn(ExperimentalLayoutApi::class)
+//                FlowRow(
+//                    modifier = modifier
+//                        //FlowRow一定是使用verticalScroll横向滚动才有item填充满的效果
+////                        .verticalScroll(rememberScrollState())
+//                        .fillMaxSize()
+//                ) {
+//                    service.characteristics.forEach {
+//                        PlatformBluetoothGattCharacteristicInfo(
+//                            characteristic = it,
+//                            expend = expend
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}

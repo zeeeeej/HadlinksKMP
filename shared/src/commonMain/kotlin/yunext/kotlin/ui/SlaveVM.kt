@@ -1,14 +1,14 @@
 package yunext.kotlin.ui
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothContext
 import com.yunext.kotlin.kmp.ble.core.PlatformPermission
 import com.yunext.kotlin.kmp.ble.core.PlatformPermissionStatus
 import com.yunext.kotlin.kmp.ble.core.platformBluetoothContext
+import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
 import com.yunext.kotlin.kmp.ble.slave.PlatformSlave
-import com.yunext.kotlin.kmp.ble.slave.PlatformSlaveEvent
-import com.yunext.kotlin.kmp.ble.slave.SlaveEventHandler
 import com.yunext.kotlin.kmp.ble.slave.SlaveState
-import com.yunext.kotlin.kmp.common.logger.HDLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,12 +20,12 @@ data class SlaveVMState(
     val enable: Boolean = false,
     val location: Boolean = false,
     val permissions: List<Pair<PlatformPermission, PlatformPermissionStatus>> = emptyList(),
-    val slaveState: SlaveState
+    val slaveState: SlaveState,
+    val histories:List<BluetoothHistory> = emptyList()
 )
 
-
 @ExperimentalUuidApi
-class SlaveVM : BaseVM() {
+class SlaveVM : ViewModel() {
     private val setting = SettingDataSource.setting
     private val platformBluetoothContext: PlatformBluetoothContext = platformBluetoothContext()
     private val _state: MutableStateFlow<SlaveVMState> =
@@ -37,7 +37,7 @@ class SlaveVM : BaseVM() {
     }
 
     init {
-        vmScope.launch {
+        viewModelScope.launch {
 
             launch {
                 platformBluetoothContext.enable.collect {
@@ -75,9 +75,14 @@ class SlaveVM : BaseVM() {
                 }
             }
 
-            vmScope.launch {
+            launch {
                 slave.eventChannel.receiveAsFlow().collect {
                     println("[BLE]vm event = $it")
+                }
+            }
+            launch {
+                slave.history.histories.collect{
+                    _state.value = state.value.copy(histories = it.asReversed())
                 }
             }
         }
@@ -98,10 +103,10 @@ class SlaveVM : BaseVM() {
         slave.stopBroadcast()
     }
 
-    override fun onClear() {
-        super.onClear()
+
+    override fun onCleared() {
+        super.onCleared()
+        println("slaveVm onClear")
         slave.close()
     }
-
-
 }
