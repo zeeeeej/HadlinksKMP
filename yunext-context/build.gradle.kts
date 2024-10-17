@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-val appVersion = "0.0.2"
+val appVersion =  project.findProperty("app_version")?.toString()?:throw GradleException("no app_version in gradle.properties")
 
 group = "io.github.zeeeeej"
 version = appVersion
