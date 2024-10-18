@@ -68,10 +68,15 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources) // SEE https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-images-resources.html
             implementation(compose.components.uiToolingPreview)
-//            implementation(projects.yunextCommon)
-//            implementation(projects.yunextContext)
-            implementation(libs.bundles.yunext)
-            implementation(projects.yunextBle)
+            if (project.findProperty("use_local").toString().toBoolean()) {
+                implementation(projects.yunextCommon)
+                implementation(projects.yunextContext)
+                implementation(projects.yunextBle)
+                implementation(libs.zeeeeej.zhongguohong)
+                implementation(libs.zeeeeej.zhongguohong.compose)
+            } else {
+                implementation(libs.bundles.yunext)
+            }
             implementation(libs.bundles.navigation)
         }
 
@@ -96,7 +101,7 @@ kotlin {
                 api(libs.ktor.client.core.wasm)
             }
         }
-        
+
         jvmMain.dependencies {
             api(libs.ktor.client.core)
             api(libs.ktor.client.okhttp)
