@@ -1,5 +1,7 @@
 package yunext.kotlin.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,12 +9,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomDrawer
 import androidx.compose.material.BottomDrawerValue.Closed
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.twotone.Info
+import androidx.compose.material.icons.twotone.KeyboardArrowDown
 import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -21,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -112,6 +121,8 @@ fun MasterScreen(modifier: Modifier = Modifier, controller: NavHostController, o
         )
     }
     Box(Modifier.fillMaxSize()) {
+
+
         Scaffold(scaffoldState = scaffoldState) {
             BottomDrawer(
                 drawerContent = {
@@ -119,10 +130,23 @@ fun MasterScreen(modifier: Modifier = Modifier, controller: NavHostController, o
                 },
                 modifier = Modifier.fillMaxSize(),
                 drawerState = drawerState,
-                gesturesEnabled = drawerState.isClosed
+                gesturesEnabled = false
 
             ) {
                 content()
+            }
+        }
+
+        AnimatedVisibility(drawerState.isClosed,modifier = Modifier.align(Alignment.BottomCenter)) {
+            FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        drawerState.open()
+                    }
+                }, modifier = Modifier.size(48.dp), backgroundColor =
+                ZhongGuoSe.向日葵黄.color
+            ) {
+                Image(Icons.Default.Info, null, modifier = Modifier)
             }
         }
     }

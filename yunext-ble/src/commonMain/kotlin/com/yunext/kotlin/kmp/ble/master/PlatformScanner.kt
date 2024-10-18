@@ -2,16 +2,16 @@ package com.yunext.kotlin.kmp.ble.master
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface PlatformScanner{
-    val status:StateFlow<PlatformMasterScanStatus>
-    val scanResults:StateFlow<List<PlatformMasterScanResult>>
+interface PlatformScanner {
+    val status: StateFlow<PlatformMasterScanStatus>
+    val scanResults: StateFlow<List<PlatformMasterScanResult>>
 }
 
 sealed interface PlatformMasterScanStatus {
 
     data object ScanStopped : PlatformMasterScanStatus
 
-    data class Scanning(val filter: PlatformMasterScanFilter) : PlatformMasterScanStatus
+    data class Scanning(val filter: List<PlatformMasterScanFilter>) : PlatformMasterScanStatus
 }
 
 interface PlatformMasterScanResult {
@@ -26,7 +26,7 @@ data class DefaultPlatformMasterScanResult(
     override val address: String?,
     override val rssi: Int,
     override val data: ByteArray
-) :PlatformMasterScanResult {
+) : PlatformMasterScanResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
@@ -54,9 +54,9 @@ interface PlatformMasterScanFilter {
     fun check(result: PlatformMasterScanResult): Boolean
 }
 
-internal class DeviceNamePlatformMasterScanFilter(val deviceName: String) : PlatformMasterScanFilter {
+class DeviceNamePlatformMasterScanFilter(val deviceName: String) : PlatformMasterScanFilter {
     override fun check(result: PlatformMasterScanResult): Boolean {
-        return result.deviceName?.contains(deviceName)?:false
+        return result.deviceName?.contains(deviceName) ?: false
     }
 
 }

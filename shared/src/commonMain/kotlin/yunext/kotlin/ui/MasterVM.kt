@@ -12,6 +12,7 @@ import com.yunext.kotlin.kmp.ble.core.PlatformPermissionStatus
 import com.yunext.kotlin.kmp.ble.core.bluetoothDevice
 import com.yunext.kotlin.kmp.ble.core.platformBluetoothContext
 import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
+import com.yunext.kotlin.kmp.ble.master.DeviceNamePlatformMasterScanFilter
 import com.yunext.kotlin.kmp.ble.master.PlatformConnectorStatus
 import com.yunext.kotlin.kmp.ble.master.PlatformMaster
 import com.yunext.kotlin.kmp.ble.master.PlatformMasterScanResult
@@ -38,7 +39,7 @@ data class MasterVMState(
     val connectStatusList: List<PlatformConnectorStatus> = emptyList(),
     val scanResults: List<PlatformMasterScanResult> = emptyList(),
     val connectServices: List<Pair<String, List<PlatformBluetoothGattService>>> = emptyList(),
-    val histories:List<BluetoothHistory> = emptyList()
+    val histories: List<BluetoothHistory> = emptyList()
 )
 
 
@@ -49,7 +50,13 @@ class MasterVM : ViewModel() {
 
     val state: StateFlow<MasterVMState> = _state.asStateFlow()
     private val master by lazy {
-        PlatformMaster(platformBluetoothContext)
+        PlatformMaster(
+            platformBluetoothContext, filters = listOf(
+                DeviceNamePlatformMasterScanFilter(
+                    "angel_"
+                )
+            )
+        )
     }
 
     init {
@@ -109,7 +116,7 @@ class MasterVM : ViewModel() {
             }
 
             launch {
-                master.historyOwner.histories.collect{
+                master.historyOwner.histories.collect {
                     _state.value = state.value.copy(histories = it.asReversed())
                 }
             }

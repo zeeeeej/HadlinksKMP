@@ -21,8 +21,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryOwner) :
-    PlatformScanner,BluetoothHistoryOwner by historyOwner {
+internal class AndroidNativeScanner(
+    ctx: Context, historyOwner: BluetoothHistoryOwner,
+    private val filters: List<PlatformMasterScanFilter>
+) :
+    PlatformScanner, BluetoothHistoryOwner by historyOwner {
     private val context: Context = ctx.applicationContext
     private val _status: MutableStateFlow<PlatformMasterScanStatus> =
         MutableStateFlow(PlatformMasterScanStatus.ScanStopped)
@@ -35,23 +38,22 @@ internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryO
         context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val adapter = bluetoothManager.adapter
     private val scanner = adapter.bluetoothLeScanner
-    private var filter: PlatformMasterScanFilter = DeviceNamePlatformMasterScanFilter("angel_")
     private val scanCallback = object : ScanCallback() {
         override fun onBatchScanResults(results: MutableList<ScanResult>?) {
             super.onBatchScanResults(results)
             d("onBatchScanResults results=${results?.size}")
             onScanningChanged(PlatformMasterScanStatus.ScanStopped)
-            bleIn("onBatchScanResults:${results?.size}",tag = "scanCallback")
+            bleIn("onBatchScanResults:${results?.size}", tag = "scanCallback")
         }
 
         override fun onScanFailed(errorCode: Int) {
             super.onScanFailed(errorCode)
             d("onScanFailed errorCode=$errorCode")
             val s = if (errorCode == 0) {
-                PlatformMasterScanStatus.Scanning(filter)
+                PlatformMasterScanStatus.Scanning(filters)
             } else PlatformMasterScanStatus.ScanStopped
             onScanningChanged(s)
-            bleIn("onScanFailed:${errorCode}",tag = "scanCallback")
+            bleIn("onScanFailed:${errorCode}", tag = "scanCallback")
         }
 
         @SuppressLint("MissingPermission")
@@ -69,13 +71,21 @@ internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryO
                 rssi = rssi,
                 data = data, device = result.device
             )
-            val check = filter.check(scanResult)
+            val check = doFilter(scanResult)
             d("onScanResult check=$check callbackType=${callbackType} address=${address} deviceName=${deviceName} rssi=$rssi")
             if (check) {
-                bleIn("onScanResult:${deviceName} $address $rssi",tag = "scanCallback")
+                bleIn("onScanResult:${deviceName} $address $rssi", tag = "scanCallback")
                 onScanResult(scanResult)
             }
         }
+    }
+
+    private fun doFilter(result: AndroidMasterScanResult): Boolean {
+        filters.forEach {
+            val r = it.check(result)
+            if (!r) return false
+        }
+        return true
     }
 
 
@@ -83,7 +93,7 @@ internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryO
     private val leScanCallback =
         BluetoothAdapter.LeScanCallback { d, rssi, scanRecord ->
 
-            d("onLeScanaddress=${d?.address?:""} deviceName=${d?.name?:""} rssi=$rssi")
+            d("onLeScanaddress=${d?.address ?: ""} deviceName=${d?.name ?: ""} rssi=$rssi")
             val device = d ?: return@LeScanCallback
             val address = device.address
             val deviceName = device.name
@@ -94,7 +104,7 @@ internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryO
                 rssi = rssi,
                 data = data, device = device
             )
-            val check = filter.check(scanResult)
+            val check = doFilter(scanResult)
             d("onLeScan check=$check address=${address} deviceName=${deviceName} rssi=$rssi")
             if (check) {
                 onScanResult(scanResult)
@@ -104,10 +114,9 @@ internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryO
     private var startScanJob: Job? = null
 
     @SuppressLint("MissingPermission")
-    fun startScan(filter: PlatformMasterScanFilter = DeviceNamePlatformMasterScanFilter("angel_")) {
+    fun startScan() {
         startScanJob?.cancel()
         _scanResults.value = emptyList()
-        this.filter = filter
         val code = Build.VERSION.SDK_INT
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             i("startScan 1 @$code")
@@ -120,13 +129,13 @@ internal class AndroidNativeScanner(ctx: Context,historyOwner: BluetoothHistoryO
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
                 .build()
-            scanner.startScan(filters,setting,scanCallback)
+            scanner.startScan(filters, setting, scanCallback)
         } else {
             i("startScan 2 @$code")
             adapter.startLeScan(leScanCallback)
         }
 
-        onScanningChanged(PlatformMasterScanStatus.Scanning(filter))
+        onScanningChanged(PlatformMasterScanStatus.Scanning(filters))
         startScanJob = masterScope.launch {
             delay(30000L)
             stopScan()

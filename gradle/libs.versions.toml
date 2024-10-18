@@ -28,8 +28,7 @@ logback = "1.5.6"
 kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.7.0"
 uiDesktop = "1.7.0"
-yunextContext = "0.0.2"
-yunextCommon = "0.0.1"
+yunext = "0.0.3"
 zhongguose = "0.0.1"
 zeeeeej = "1.0.2"
 task-tree = "2.1.1"
@@ -94,8 +93,9 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 # reflect
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 androidx-ui-desktop = { group = "androidx.compose.ui", name = "ui-desktop", version.ref = "uiDesktop" }
-yunext-context = { module = "io.github.zeeeeej:yunext-context", version.ref = "yunextContext" }
-yunext-common = { module = "io.github.zeeeeej:yunext-common", version.ref = "yunextCommon" }
+yunext-context = { module = "io.github.zeeeeej:yunext-context", version.ref = "yunext" }
+yunext-common = { module = "io.github.zeeeeej:yunext-common", version.ref = "yunext" }
+yunext-ble = { module = "io.github.zeeeeej:yunext-ble", version.ref = "yunext" }
 zeeeeej-zhongguohong = { module = "io.github.zeeeeej:zhongguohong", version.ref = "zeeeeej" }
 zeeeeej-zhongguohong-compose = { module = "io.github.zeeeeej:zhongguohong-compose", version.ref = "zeeeeej" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
@@ -126,7 +126,7 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 task-tree = { id = "com.dorongold.task-tree", version.ref = "task-tree" }
 [bundles]
 navigation = ["navigation-common", "navigation-compose","navigation-runtime"]
-yunext = ["yunext-context", "yunext-common", "zeeeeej-zhongguohong", "zeeeeej-zhongguohong-compose"]
+yunext = ["yunext-context", "yunext-common", "zeeeeej-zhongguohong", "zeeeeej-zhongguohong-compose","yunext-ble"]
 androidx-lifecycle = ["androidx-lifecycle-viewmodel","androidx-lifecycle-viewmodel-ktx",
     "androidx-lifecycle-livedata-ktx", "androidx-lifecycle-runtime-ktx", "androidx-lifecycle-viewmodel-savedstate",
     "androidx-lifecycle-common-java8",

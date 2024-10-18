@@ -56,4 +56,5 @@ interface PlatformMaster:PlatformScanner {
 
 expect fun PlatformMaster(
     context: PlatformBluetoothContext,
+    filters: List<PlatformMasterScanFilter>
 ): PlatformMaster

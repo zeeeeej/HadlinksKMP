@@ -1,18 +1,24 @@
 package yunext.kotlin.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomDrawer
 import androidx.compose.material.BottomDrawerValue.Closed
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.rememberBottomDrawerState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -26,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import color
 import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
 import com.yunext.kotlin.kmp.ble.history.type
 import com.yunext.kotlin.kmp.ble.slave.SlaveState
@@ -87,7 +94,7 @@ private fun SlaveScreenInternal(modifier: Modifier = Modifier, slaveVM: SlaveVM)
                 },
                 modifier = Modifier.fillMaxSize(),
                 drawerState = drawerState,
-                gesturesEnabled = drawerState.isClosed
+                gesturesEnabled = false
 
             ) {
                 Column(modifier.fillMaxWidth()) {
@@ -112,6 +119,18 @@ private fun SlaveScreenInternal(modifier: Modifier = Modifier, slaveVM: SlaveVM)
             }
         }
 
+        AnimatedVisibility(drawerState.isClosed,modifier = Modifier.align(Alignment.BottomCenter)) {
+            FloatingActionButton(
+                onClick = {
+                    coroutineScope.launch {
+                        drawerState.open()
+                    }
+                }, modifier = Modifier.size(48.dp), backgroundColor =
+                ZhongGuoSe.向日葵黄.color
+            ) {
+                Image(Icons.Default.Info, null, modifier = Modifier)
+            }
+        }
 
     }
 

@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-internal class FastBleScanner() :
+internal class FastBleScanner(  private val filters: List<PlatformMasterScanFilter> = listOf(
+    DeviceNamePlatformMasterScanFilter(
+        "angel_"
+    )
+)) :
     PlatformScanner {
     private val fastBle: BleManager = BleManager.getInstance()
 
@@ -53,7 +57,7 @@ internal class FastBleScanner() :
                 d("[startScan]onScanStarted success:$success")
                 onScanningChanged(
                     if (success) {
-                        PlatformMasterScanStatus.Scanning(filter)
+                        PlatformMasterScanStatus.Scanning(filters)
                     } else {
                         PlatformMasterScanStatus.ScanStopped
                     }

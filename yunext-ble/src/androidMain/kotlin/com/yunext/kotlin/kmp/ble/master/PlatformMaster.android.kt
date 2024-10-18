@@ -22,10 +22,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.uuid.ExperimentalUuidApi
 
-actual fun PlatformMaster(context: PlatformBluetoothContext): PlatformMaster {
-    return AndroidMaster(context as AndroidBluetoothContext)
+actual fun PlatformMaster(context: PlatformBluetoothContext,    filters: List<PlatformMasterScanFilter> ): PlatformMaster {
+    return AndroidMaster(context as AndroidBluetoothContext,filters = filters)
 }
 
 internal val masterScope by lazy {
@@ -35,13 +34,18 @@ internal val masterScope by lazy {
 
 private class AndroidMaster(
     platformContext: AndroidBluetoothContext,
-    override val historyOwner: BluetoothHistoryOwner = BluetoothHistoryImpl()
+    override val historyOwner: BluetoothHistoryOwner = BluetoothHistoryImpl(),
+    private val filters: List<PlatformMasterScanFilter> = listOf(
+        DeviceNamePlatformMasterScanFilter(
+            "angel_"
+        )
+    )
 ) : PlatformMaster, BluetoothHistoryOwner by historyOwner {
     private val platformContext: AndroidBluetoothContext = platformContext
     private val context = (platformContext).context.applicationContext
 
     //        private val scanner = FastBleScanner()
-    private val scanner = AndroidNativeScanner(context, historyOwner)
+    private val scanner = AndroidNativeScanner(context, historyOwner,filters)
     override val status: StateFlow<PlatformMasterScanStatus> = scanner.status
     override val scanResults: StateFlow<List<AndroidMasterScanResult>> = scanner.scanResults
 
