@@ -12,6 +12,7 @@ import com.yunext.kotlin.kmp.ble.core.PlatformPermissionStatus
 import com.yunext.kotlin.kmp.ble.core.bluetoothDevice
 import com.yunext.kotlin.kmp.ble.core.platformBluetoothContext
 import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
+import com.yunext.kotlin.kmp.ble.master.DeviceNamePlatformMasterScanFilter
 import com.yunext.kotlin.kmp.ble.master.PlatformConnectorStatus
 import com.yunext.kotlin.kmp.ble.master.PlatformMaster
 import com.yunext.kotlin.kmp.ble.master.PlatformMasterScanResult

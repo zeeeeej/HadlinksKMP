@@ -164,6 +164,7 @@ internal class AndroidNativeScanner(
     }
 
     fun close() {
+        stopScan()
         startScanJob?.cancel()
         _scanResults.value = emptyList()
         _status.value = PlatformMasterScanStatus.ScanStopped
