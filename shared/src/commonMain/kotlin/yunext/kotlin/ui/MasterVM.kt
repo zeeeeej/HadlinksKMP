@@ -53,7 +53,7 @@ class MasterVM : ViewModel() {
         PlatformMaster(
             platformBluetoothContext, filters = listOf(
                 DeviceNamePlatformMasterScanFilter(
-                    "B#"
+                    "water"
                 )
             )
         )

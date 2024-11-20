@@ -174,6 +174,7 @@ internal fun PlatformBluetoothGattCharacteristic.asNativeBase(): BluetoothGattCh
         )
         result.addDescriptor(notifyDescriptor.asNativeBase())
     }
+    result.setValue(this.value)
     return result
 }
 
@@ -193,7 +194,9 @@ private fun characteristicPropertyNativeOf(properties: Array<PlatformBluetoothGa
 internal fun PlatformBluetoothGattDescriptor.asNativeBase(): BluetoothGattDescriptor {
     val uuid = this.uuid.toUUID()
     val permissions = descriptorPermissionNativeOf(this.permissions)
-    return BluetoothGattDescriptor(uuid, permissions)
+    return BluetoothGattDescriptor(uuid, permissions).apply {
+        setValue(this.value)
+    }
 }
 
 private fun descriptorPermissionNativeOf(permissions: Array<PlatformBluetoothGattDescriptor.Permission>): Int {

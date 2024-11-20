@@ -19,15 +19,19 @@ val PlatformBluetoothGattService.display: String
         |
     """.trimMargin()
 
+@OptIn(ExperimentalStdlibApi::class)
 val PlatformBluetoothGattCharacteristic.display: String
     get() = """
         |   ${this.uuid.toString()} ${this.permissions.display}  ${this.properties.display} (${this.descriptors.size}个)
         |   ${this.descriptors.joinToString { it.display }}
+        |   ${this.value.toString()} ${this.value?.toHexString()})
     """.trimMargin()
 
+@OptIn(ExperimentalStdlibApi::class)
 val PlatformBluetoothGattDescriptor.display: String
     get() = """
         |   ${this.uuid.toString()} ${this.permissions.display})
+        |   ${this.value.toString()} ${this.value?.toHexString()})
     """.trimMargin()
 
 val Array<PlatformBluetoothGattCharacteristic.Permission>.display:String

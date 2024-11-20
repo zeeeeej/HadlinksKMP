@@ -275,9 +275,9 @@ internal class AndroidPlatformServer(
 
                 val d = device ?: return
 
-                bluetoothGattServer?.services?.let { serviceList ->
-                    w("刷新测试：\n${serviceList.display}")
-                }
+//                bluetoothGattServer?.services?.let { serviceList ->
+//                    w("刷新测试：\n${serviceList.display}")
+//                }
 
                 injectCallback {
                     val r = BleSlaveOnDescriptorWriteRequest(
@@ -381,6 +381,9 @@ internal class AndroidPlatformServer(
     fun start(services: Array<PlatformBluetoothGattService>) {
 
         d("[AndroidPlatformServer]addService services:${services.size}")
+        services.forEach {
+            it.display
+        }
         addServiceInStartJob?.cancel()
         bluetoothGattServer?.cancel()
         bluetoothGattServer = null

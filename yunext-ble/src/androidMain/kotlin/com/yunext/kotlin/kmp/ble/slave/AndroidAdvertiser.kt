@@ -7,6 +7,7 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.AdvertisingSetCallback
 import android.content.Context
+import android.os.ParcelUuid
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattService
 import com.yunext.kotlin.kmp.ble.master.masterScope
 import com.yunext.kotlin.kmp.ble.util.d
@@ -16,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.lang.IllegalStateException
+import kotlin.uuid.ExperimentalUuidApi
 
 internal sealed interface AdvertiserEvent {
     data object OnSuccess : AdvertiserEvent
@@ -108,6 +110,7 @@ internal class AndroidPlatformAdvertiser(
         startInternal(deviceName, broadcastService, timeout)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     @SuppressLint("MissingPermission")
     private fun startInternal(
         deviceName: String,
@@ -138,7 +141,7 @@ internal class AndroidPlatformAdvertiser(
 //                    0x0A,
 //                    byteArrayOf(0x01)
 //                )
-//                .addServiceUuid(ParcelUuid(serviceUUID))
+                .addServiceUuid(ParcelUuid.fromString(broadcastService.uuid.toString()))
                 .build()
         val scanResponseData = null
         bluetoothLeAdvertiser.startAdvertising(

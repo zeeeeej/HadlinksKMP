@@ -39,7 +39,7 @@ val BluetoothGattCharacteristic.display: String
 @OptIn(ExperimentalStdlibApi::class)
 val BluetoothGattDescriptor.display: String
     get() = """
-        |${this.uuid.toString()} ${this.permissions} ${this.value?.toHexString()} ${this.asPlatformBase().status})
+        |${this.uuid.toString()} p:${this.permissions} v:${this.value?.toHexString()} s:${this.asPlatformBase().status})
     """.trimMargin()
 
 

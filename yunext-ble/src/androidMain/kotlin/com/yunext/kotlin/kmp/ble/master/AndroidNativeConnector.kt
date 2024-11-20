@@ -393,7 +393,8 @@ internal class AndroidNativeConnector(
     }
 
     private fun onServicesChangedInternal(gatt: BluetoothGatt) {
-        startDebug(gatt.services)
+        // startDebug(gatt.services)
+        println("gatt.services.display :${gatt.services.display}")
         _status.value =
             PlatformConnectorStatus.ServiceDiscovered(
                 device = device.asPlatformBase(),
