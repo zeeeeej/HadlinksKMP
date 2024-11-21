@@ -381,13 +381,20 @@ internal class AndroidPlatformServer(
     fun start(services: Array<PlatformBluetoothGattService>) {
 
         d("[AndroidPlatformServer]addService services:${services.size}")
+        println("******************** a")
         services.forEach {
-            it.display
+            println( it.display)
         }
+        println("******************** b")
         addServiceInStartJob?.cancel()
         bluetoothGattServer?.cancel()
         bluetoothGattServer = null
         val bluetoothGattServices = services.map { it.asNativeBase() }
+        println("-------------------- c")
+        bluetoothGattServices.forEach {
+            println( it.display)
+        }
+        println("-------------------- d")
         val curBluetoothGattServer =
             bluetoothManager.openGattServer(context, bluetoothGattServerCallback)
                 ?: throw IllegalStateException("openGattServer result null")
@@ -405,10 +412,25 @@ internal class AndroidPlatformServer(
                     return@forEach
                 }
             }
+
+
             if (success) {
+
                 bluetoothGattServer = curBluetoothGattServer
                 callback(ServerEvent.AddServiceSuccess(curBluetoothGattServer.services))
                 d("====add after==== ${curBluetoothGattServer.services.size}")
+
+//                delay(3000)
+//                bluetoothGattServices.forEach {
+//                    it.characteristics.forEach {
+//                        ch->
+//                        ch.descriptors.forEach {
+//                            de->
+//                            de.value = byteArrayOf(0x01)
+//                        }
+//                        write(ch, byteArrayOf(),false)
+//                    }
+//                }
             } else {
                 curBluetoothGattServer.cancel()
                 callback(ServerEvent.AddServiceFail)

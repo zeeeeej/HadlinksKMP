@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.os.Build
+import com.yunext.kotlin.kmp.ble.util.display
 import com.yunext.kotlin.kmp.ble.util.toUUID
 import com.yunext.kotlin.kmp.ble.util.toUuid
 import kotlin.uuid.ExperimentalUuidApi
@@ -190,13 +191,15 @@ private fun characteristicPropertyNativeOf(properties: Array<PlatformBluetoothGa
     }.toInt()
 }
 
-@OptIn(ExperimentalUuidApi::class)
+@OptIn(ExperimentalUuidApi::class, ExperimentalStdlibApi::class)
 internal fun PlatformBluetoothGattDescriptor.asNativeBase(): BluetoothGattDescriptor {
     val uuid = this.uuid.toUUID()
     val permissions = descriptorPermissionNativeOf(this.permissions)
-    return BluetoothGattDescriptor(uuid, permissions).apply {
-        setValue(this.value)
-    }
+    val v = this.value
+    val descriptor = BluetoothGattDescriptor(uuid, permissions)
+    val result = descriptor.setValue(v)
+    println("d::asNativeBase(): result:${result} -> ${v?.toHexString()}")
+    return descriptor
 }
 
 private fun descriptorPermissionNativeOf(permissions: Array<PlatformBluetoothGattDescriptor.Permission>): Int {

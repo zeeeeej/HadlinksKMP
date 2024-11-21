@@ -100,6 +100,7 @@ internal class AndroidSlave(
     private var startJob: Job? = null
     private var startBroadcastPrepareJob: Job? = null
 
+    @OptIn(ExperimentalUuidApi::class)
     override fun startBroadcast() {
         i("[${TAG}]startBroadcast")
         bleOpt("startBroadcast")
@@ -208,10 +209,19 @@ internal class AndroidSlave(
                                             "<${it.descriptor?.value?.toHexString()}> by ${it.descriptor?.uuid.toString()}/${it.descriptor?.characteristic?.uuid.toString()}",
                                             tag = "OnDescriptorReadRequest"
                                         )
+
+
+                                        // 回复read
+                                        val desc = setting.searchDescriptor(
+                                            it.descriptor?.uuid.toString() ?: "",
+                                            it.descriptor?.characteristic?.uuid.toString() ?: "",
+                                            it.descriptor?.characteristic?.service?.uuid.toString()
+                                                ?: ""
+                                        )
                                         PlatformResponse(
                                             requestId = it.requestId,
                                             offset = it.offset,
-                                            value = null
+                                            value = desc?.value?: byteArrayOf()
                                         )
                                     }
 
@@ -378,7 +388,7 @@ internal class AndroidSlave(
 
     private var debugForWriteJob: Job? = null
     private fun debugForNotify() {
-        if (false) return
+        if (true) return
         debugForWriteJob?.cancel()
         debugForWriteJob = slaveScope.launch {
             val ch = setting.services

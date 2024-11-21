@@ -141,7 +141,7 @@ internal class AndroidPlatformAdvertiser(
 //                    0x0A,
 //                    byteArrayOf(0x01)
 //                )
-                .addServiceUuid(ParcelUuid.fromString(broadcastService.uuid.toString()))
+//                .addServiceUuid(ParcelUuid.fromString(broadcastService.uuid.toString()))
                 .build()
         val scanResponseData = null
         bluetoothLeAdvertiser.startAdvertising(

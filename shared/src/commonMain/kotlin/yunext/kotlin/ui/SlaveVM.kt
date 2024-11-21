@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import yunext.kotlin.repository.SettingDataSource2
 import kotlin.uuid.ExperimentalUuidApi
 
 data class SlaveVMState(
@@ -26,7 +27,7 @@ data class SlaveVMState(
 
 @ExperimentalUuidApi
 class SlaveVM : ViewModel() {
-    private val setting = SettingDataSource.setting
+    private val setting = SettingDataSource2.createWaterSetting()
     private val platformBluetoothContext: PlatformBluetoothContext = platformBluetoothContext()
     private val _state: MutableStateFlow<SlaveVMState> =
         MutableStateFlow(SlaveVMState(slaveState = SlaveState.Idle(setting = setting)))
