@@ -29,9 +29,11 @@ val BluetoothGattService.display: String
         |   ${this.characteristics.joinToString("\n") { it.display }}
     """.trimMargin()
 
+
 val BluetoothGattCharacteristic.display: String
+    @OptIn(ExperimentalStdlibApi::class)
     get() = """
-        |${this.uuid.toString()} ${this.permissions}  ${this.properties} (${this.descriptors.size}个)
+        |${this.uuid.toString()} v:${this.value?.toHexString()} ps:${this.permissions}  pt:${this.properties} (${this.descriptors.size}个)
         |   ${this.descriptors.joinToString { it.display }}
     """.trimMargin()
 

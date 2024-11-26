@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomDrawer
 import androidx.compose.material.BottomDrawerValue.Closed
-import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.rememberBottomDrawerState
@@ -35,11 +31,9 @@ import androidx.navigation.NavHostController
 import color
 import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
 import com.yunext.kotlin.kmp.ble.history.type
-import com.yunext.kotlin.kmp.ble.slave.SlaveState
 import com.yunext.kotlin.kmp.common.util.datetimeFormat
 import kotlinx.coroutines.launch
 import yunext.kotlin.util.clipBroad
-import yunext.kotlin.util.randomBG
 import kotlin.uuid.ExperimentalUuidApi
 
 @Deprecated("delete")
@@ -111,7 +105,8 @@ private fun SlaveScreenInternal(modifier: Modifier = Modifier, slaveVM: SlaveVM)
                         SlaveStateInfo(
                             state = state.slaveState,
                             onStart = slaveVM::start,
-                            onStop = slaveVM::stop
+                            onStop = slaveVM::stop,
+                            onSync = slaveVM::notifyAllCh
                         )
                     }
                 }

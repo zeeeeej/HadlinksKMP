@@ -1,5 +1,6 @@
 package com.yunext.kotlin.kmp.ble.slave
 
+import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -183,10 +184,18 @@ internal class AndroidSlave(
                                             "<${it.characteristic?.value?.toHexString()}> by ${it.characteristic?.uuid.toString()}/${it.characteristic?.service?.uuid.toString()}",
                                             tag = "OnCharacteristicReadRequest"
                                         )
+
+                                        // 回复read
+                                        val desc = setting.searchCharacteristics(
+                                            it.characteristic?.uuid.toString() ?: "",
+                                            it.characteristic?.service?.uuid.toString() ?: "",
+
+                                            )
+
                                         PlatformResponse(
                                             requestId = it.requestId,
                                             offset = it.offset,
-                                            value = null
+                                            value = desc?.value
                                         )
                                     }
 
@@ -221,7 +230,7 @@ internal class AndroidSlave(
                                         PlatformResponse(
                                             requestId = it.requestId,
                                             offset = it.offset,
-                                            value = desc?.value?: byteArrayOf()
+                                            value = desc?.value ?: byteArrayOf()
                                         )
                                     }
 
@@ -231,6 +240,7 @@ internal class AndroidSlave(
                                             "<${it.value?.toHexString()}> by ${it.descriptor?.uuid.toString()}/${it.descriptor?.characteristic?.uuid.toString()}",
                                             tag = "OnDescriptorWriteRequest"
                                         )
+                                        it.descriptor?.value = it.value
                                         PlatformResponse(
                                             requestId = it.requestId,
                                             offset = it.offset,
@@ -387,6 +397,7 @@ internal class AndroidSlave(
     }
 
     private var debugForWriteJob: Job? = null
+    private var notifyAllJob: Job? = null
     private fun debugForNotify() {
         if (true) return
         debugForWriteJob?.cancel()
@@ -405,6 +416,24 @@ internal class AndroidSlave(
         }
     }
 
+    private fun notifyAllDebug() {
+        notifyAllJob?.cancel()
+        notifyAllJob = slaveScope.launch {
+            val chs = setting.services
+                .flatMap {
+                    it.characteristics.toList()
+                }.filter {
+                    it.properties.contains(PlatformBluetoothGattCharacteristic.Property.Notify)
+                }
+            chs.forEach { ch ->
+                delay(1000)
+                if (slaveState.value is SlaveState.Connected) {
+                    notify(SlaveWriteParam(ch, ch.value ?: byteArrayOf(), false))
+                }
+            }
+        }
+    }
+
     private fun autoBroadcastDelay(tag: String, delay: Long = 1000L) {
         d("[${TAG}]autoBroadcastDelay $delay ms from $tag")
         delayReBroadcast = slaveScope.launch {
@@ -419,6 +448,7 @@ internal class AndroidSlave(
         startBroadcastPrepareJob?.cancel()
         startBroadcastPrepareJob = null
         debugForWriteJob?.cancel()
+        notifyAllJob?.cancel()
         advertiser?.stop()
         delayReBroadcast?.cancel()
         startBroadcastTimeoutJob?.cancel()

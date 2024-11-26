@@ -1,5 +1,6 @@
 package com.yunext.kotlin.kmp.ble.slave
 
+import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattCharacteristic
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattDescriptor
 import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattService
 import kotlin.uuid.ExperimentalUuidApi
@@ -24,6 +25,21 @@ fun SlaveSetting.searchDescriptor(
                 if (s.uuid.toString() == serviceUUID && c.uuid.toString() == chUUID && d.uuid.toString() == descUUID) {
                     return d
                 }
+            }
+        }
+    }
+    return null
+}
+
+@OptIn(ExperimentalUuidApi::class)
+fun SlaveSetting.searchCharacteristics(
+    chUUID: String,
+    serviceUUID: String
+): PlatformBluetoothGattCharacteristic? {
+    services.forEach { s ->
+        s.characteristics.forEach { c ->
+            if (s.uuid.toString() == serviceUUID && c.uuid.toString() == chUUID) {
+                return c
             }
         }
     }

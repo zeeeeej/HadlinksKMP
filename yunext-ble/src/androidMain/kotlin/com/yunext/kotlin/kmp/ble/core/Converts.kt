@@ -198,7 +198,7 @@ internal fun PlatformBluetoothGattDescriptor.asNativeBase(): BluetoothGattDescri
     val v = this.value
     val descriptor = BluetoothGattDescriptor(uuid, permissions)
     val result = descriptor.setValue(v)
-    println("d::asNativeBase(): result:${result} -> ${v?.toHexString()}")
+    println("d::asNativeBase(): result:${result} -> p:$permissions v:${v?.toHexString()} old p：${this.permissions.display}")
     return descriptor
 }
 

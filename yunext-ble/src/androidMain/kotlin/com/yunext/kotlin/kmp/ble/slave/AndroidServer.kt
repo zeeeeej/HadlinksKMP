@@ -44,26 +44,27 @@ internal sealed interface ServerEvent {
 }
 
 internal sealed interface ConnectState {
-    data object NaN : ConnectState{
+    data object NaN : ConnectState {
         override fun toString(): String {
             return "NaN"
         }
     }
-    data class Disconnected(val device: BluetoothDevice) : ConnectState{
+
+    data class Disconnected(val device: BluetoothDevice) : ConnectState {
         override fun toString(): String {
             return "Disconnected ${device.display}"
         }
     }
+
     data class Connected(
         val device: BluetoothDevice,
         val services: List<BluetoothGattService> = emptyList()
-    ) : ConnectState{
+    ) : ConnectState {
         override fun toString(): String {
             return "Connected ${device.display} ${services.size}"
         }
     }
 }
-
 
 
 internal class AndroidPlatformServer(
@@ -383,7 +384,7 @@ internal class AndroidPlatformServer(
         d("[AndroidPlatformServer]addService services:${services.size}")
         println("******************** a")
         services.forEach {
-            println( it.display)
+            println(it.display)
         }
         println("******************** b")
         addServiceInStartJob?.cancel()
@@ -392,15 +393,16 @@ internal class AndroidPlatformServer(
         val bluetoothGattServices = services.map { it.asNativeBase() }
         println("-------------------- c")
         bluetoothGattServices.forEach {
-            println( it.display)
+            println(it.display)
         }
         println("-------------------- d")
+        addServiceInStartJob = coroutineScope.launch {
+            delay(BleConfig.OPT_INTERVAL_TIMESTAMP)
         val curBluetoothGattServer =
             bluetoothManager.openGattServer(context, bluetoothGattServerCallback)
                 ?: throw IllegalStateException("openGattServer result null")
         var success = true
-        addServiceInStartJob = coroutineScope.launch {
-            delay(BleConfig.OPT_INTERVAL_TIMESTAMP)
+
             bluetoothGattServices.forEach {
                 ensureActive()
                 d("====add before==== ${curBluetoothGattServer.services.size}")

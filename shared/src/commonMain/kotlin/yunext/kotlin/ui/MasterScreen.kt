@@ -101,6 +101,8 @@ fun MasterScreen(modifier: Modifier = Modifier, controller: NavHostController, o
                 },
                 onNotify = { device, service, char ->
                     masterVM.notify(device, service, char)
+                }, onSync = {device->
+                    masterVM.sync(device)
                 })
         }
     }

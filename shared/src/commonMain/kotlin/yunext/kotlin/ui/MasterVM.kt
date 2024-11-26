@@ -10,6 +10,8 @@ import com.yunext.kotlin.kmp.ble.core.PlatformBluetoothGattService
 import com.yunext.kotlin.kmp.ble.core.PlatformPermission
 import com.yunext.kotlin.kmp.ble.core.PlatformPermissionStatus
 import com.yunext.kotlin.kmp.ble.core.bluetoothDevice
+import com.yunext.kotlin.kmp.ble.core.bluetoothGattCharacteristic
+import com.yunext.kotlin.kmp.ble.core.bluetoothGattService
 import com.yunext.kotlin.kmp.ble.core.platformBluetoothContext
 import com.yunext.kotlin.kmp.ble.history.BluetoothHistory
 import com.yunext.kotlin.kmp.ble.master.DeviceNamePlatformMasterScanFilter
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 data class MasterVMState(
     val enable: Boolean = false,
@@ -176,6 +179,31 @@ class MasterVM : ViewModel() {
             val enable =
                 !(characteristic.descriptors[0].value.contentEquals(PlatformBluetoothGattDescriptor.Value.EnableNotificationValue.value))
             master.enableNotify(device, service, characteristic, enable)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    fun sync(device: PlatformBluetoothDevice) {
+        try {
+            @OptIn(ExperimentalUuidApi::class)
+            val characteristic = bluetoothGattCharacteristic(
+                uuid = Uuid.parse("0000b002-1001-1000-6864-79756e657874"),
+                permissions = arrayOf(),
+                properties = arrayOf(),
+                descriptors = arrayOf(),
+                value = null
+            )
+
+            @OptIn(ExperimentalUuidApi::class)
+            val service = bluetoothGattService(
+                uuid = Uuid.parse("00000000-1001-1000-6864-79756e657874"),
+                serviceType = PlatformBluetoothGattService.ServiceType.Primary,
+                includeServices = arrayOf(),
+                characteristics = arrayOf()
+            )
+            master.write(device, service, characteristic, byteArrayOf(0x00))
         } catch (e: Exception) {
             e.printStackTrace()
         }

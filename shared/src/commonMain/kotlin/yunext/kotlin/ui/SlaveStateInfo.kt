@@ -55,6 +55,7 @@ internal fun SlaveStateInfo(
     modifier: Modifier = Modifier.fillMaxWidth(), state: SlaveState,
     onStart: () -> Unit,
     onStop: () -> Unit,
+    onSync: () -> Unit,
 ) {
     Column(modifier) {
         Text("【Slave状态】", style = TextStyle.Default.copy(fontWeight = FontWeight.Bold))
@@ -91,7 +92,12 @@ internal fun SlaveStateInfo(
             is SlaveState.Connected -> {
 
                 Column(Modifier.fillMaxWidth().heightIn(max = 256.dp)) {
-                    "已连接${state.device.address}/${state.device.name}"
+                    //"已连接${state.device.address}/${state.device.name}"
+                    Text("同步数据",modifier = Modifier
+                        .padding(12.dp)
+                        .clickable {
+                            onSync()
+                        })
                     PlatformBluetoothGattServicesInfo(
                         services = state.services.toTypedArray(),
                         expend = true,

@@ -31,6 +31,9 @@ internal fun ConnectInfo(
         PlatformBluetoothDevice,
         PlatformBluetoothGattService,
         PlatformBluetoothGattCharacteristic
+    ) -> Unit,
+    onSync: (
+        PlatformBluetoothDevice,
     ) -> Unit
 ) {
     Column {
@@ -39,7 +42,7 @@ internal fun ConnectInfo(
             items(list, { (it.device.address) + (it.device.name) }) {
                 ConnectInfoItem(modifier = Modifier.fillMaxWidth(), status = it, onClick = {
                     onClick(it)
-                }, onNotify = onNotify)
+                }, onNotify = onNotify, onSync = onSync)
             }
         }
     }
@@ -54,6 +57,9 @@ private fun ConnectInfoItem(
         PlatformBluetoothDevice,
         PlatformBluetoothGattService,
         PlatformBluetoothGattCharacteristic
+    ) -> Unit,
+    onSync: (
+        PlatformBluetoothDevice,
     ) -> Unit
 ) {
     Column(
@@ -71,6 +77,11 @@ private fun ConnectInfoItem(
                         onClick()
                     }
                 )
+                Text("同步数据",modifier = Modifier
+                    .padding(12.dp)
+                    .clickable {
+                        onSync(status.device)
+                    })
             }
 
             is PlatformConnectorStatus.Connecting -> Text("连接中...")

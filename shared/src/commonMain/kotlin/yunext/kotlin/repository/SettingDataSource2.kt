@@ -35,7 +35,7 @@ object SettingDataSource2 {
             Uuid.parse(uuid),
             arrayOf(
                 PlatformBluetoothGattDescriptor.Permission.PermissionRead,
-                PlatformBluetoothGattDescriptor.Permission.PermissionWrite
+//                PlatformBluetoothGattDescriptor.Permission.PermissionWrite,
             ), payload
         )
     }
@@ -92,7 +92,7 @@ object SettingDataSource2 {
                     arrayOf(
                         descriptorCreator(
                             Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                            byteArrayOf(0x00)
+                            byteArrayOf(0x01,0x00)
                         ),
                         descriptorCreator(
                             Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -114,7 +114,7 @@ object SettingDataSource2 {
                     arrayOf(
                         descriptorCreator(
                             Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                            byteArrayOf(0x00)
+                            byteArrayOf(0x01,0x00)
                         ),
                         descriptorCreator(
                             Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -136,7 +136,7 @@ object SettingDataSource2 {
                     arrayOf(
                         descriptorCreator(
                             Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                            byteArrayOf(0x00)
+                            byteArrayOf(0x01,0x00)
                         ),
                         descriptorCreator(
                             Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -158,7 +158,7 @@ object SettingDataSource2 {
                     arrayOf(
                         descriptorCreator(
                             Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                            byteArrayOf(0x00)
+                            byteArrayOf(0x01,0x00)
                         ),
                         descriptorCreator(
                             Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -194,7 +194,7 @@ object SettingDataSource2 {
                     descriptors = arrayOf(
                         descriptorCreator(
                             Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                            byteArrayOf(0b11)
+                            byteArrayOf(0x01,0x00)
                         ),
                         descriptorCreator(
                             Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -250,7 +250,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -306,7 +306,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -338,7 +338,7 @@ object SettingDataSource2 {
                         )
                     ),
                 ),
-                value = byteArrayOf()
+                value = byteArrayOf(0x0A,0x0B)
             )
 
             val filterPercent2 = bluetoothGattCharacteristic(
@@ -362,7 +362,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -418,7 +418,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -475,7 +475,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -531,7 +531,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -587,7 +587,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
@@ -641,7 +641,7 @@ object SettingDataSource2 {
                 descriptors = arrayOf(
                     descriptorCreator(
                         Sig.UUID_CLIENT_CHARACTERISTIC_CONFIGURATION,
-                        byteArrayOf(0x00)
+                        byteArrayOf(0x01,0x00)
                     ),
                     descriptorCreator(
                         Sig.UUID_CHARACTERISTIC_USER_DESCRIPTION,
