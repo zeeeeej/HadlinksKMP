@@ -396,13 +396,13 @@ internal class AndroidPlatformServer(
             println(it.display)
         }
         println("-------------------- d")
-        addServiceInStartJob = coroutineScope.launch {
-            delay(BleConfig.OPT_INTERVAL_TIMESTAMP)
+
         val curBluetoothGattServer =
             bluetoothManager.openGattServer(context, bluetoothGattServerCallback)
                 ?: throw IllegalStateException("openGattServer result null")
         var success = true
-
+        addServiceInStartJob = coroutineScope.launch {
+            delay(BleConfig.OPT_INTERVAL_TIMESTAMP)
             bluetoothGattServices.forEach {
                 ensureActive()
                 d("====add before==== ${curBluetoothGattServer.services.size}")

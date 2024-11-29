@@ -42,6 +42,7 @@ include(":composeApp")
 include(":shared")
 include(":yunext-context")
 include(":yunext-common")
+include(":yunext-compose")
 include(":yunext-ble")
 
 gradle.beforeSettings{

@@ -8,9 +8,11 @@ plugins {
 //    id("module.publication")
 //    `maven-publish`
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 
-val appVersion = "0.0.1"
+val appVersion =  project.findProperty("app_version")?.toString()?:throw GradleException("no app_version in gradle.properties")
 
 group = "io.github.zeeeeej"
 version = appVersion
@@ -54,8 +56,23 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 //put your multiplatform dependencies here
+
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources) // SEE https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-images-resources.html
+                implementation(compose.components.uiToolingPreview)
             }
         }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.activity)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.bundles.androidx.lifecycle)
+        }
+
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
@@ -77,7 +94,7 @@ mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     signAllPublications()
 
-    coordinates("io.github.zeeeeej", "yunext-context", appVersion)
+    coordinates("io.github.zeeeeej", "yunext-compose", appVersion)
 
     pom {
         name.set("HadlinksKMP")
